@@ -129,6 +129,18 @@ body {
   font-family: inherit; color: var(--ink);
 }
 .hint { font-size: 11.5px; color: var(--ink-sub); margin: 6px 0 0; }
+.hint--error { color: var(--danger); }
+
+.cloud-sync {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sync-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
 
 /* 空状態・トースト */
 .empty { padding: 28px 14px; color: var(--ink-sub); text-align: center; }

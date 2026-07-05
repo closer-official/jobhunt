@@ -40,6 +40,7 @@ export interface CompanyRecord {
   schedule: StepResult | null;      // OS② 選考日程
   idealProfile: StepResult | null;  // OS③ 人物像
   esDraft: StepResult | null;       // OS④ ES/履歴書/面接対策
+  updatedAt?: string; // ISO8601（クラウド同期用）
 }
 
 export interface ScoringConditions {
@@ -59,6 +60,7 @@ export interface UserSettings {
   scoringConditions: ScoringConditions;
   dailyRunTime: string; // "09:00"
   userProfile: UserProfile;
+  updatedAt?: string; // ISO8601（クラウド同期用）
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {

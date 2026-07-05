@@ -11,6 +11,16 @@ npm run dev             # 開発時の変更監視
 npm test                # スモークテスト
 ```
 
+Firebase 連携を有効化する場合は、`.env.example` を参考に次の環境変数を設定してください。
+
+- `JOBHUNT_FIREBASE_API_KEY`
+- `JOBHUNT_FIREBASE_AUTH_DOMAIN`
+- `JOBHUNT_FIREBASE_PROJECT_ID`
+- `JOBHUNT_FIREBASE_STORAGE_BUCKET`
+- `JOBHUNT_FIREBASE_MESSAGING_SENDER_ID`
+- `JOBHUNT_FIREBASE_APP_ID`
+- `JOBHUNT_FIREBASE_MEASUREMENT_ID`
+
 1. Chromeで `chrome://extensions` を開く
 2. 右上「デベロッパーモード」をON
 3. 「パッケージ化されていない拡張機能を読み込む」→ **dist フォルダ** を選択
@@ -43,8 +53,10 @@ npm test                # スモークテスト
 - GitHub リポジトリ: `closer-official/jobhunt`
 - Firebase Hosting の既定プロジェクト: `jobhunt-b0f49`
 - Vercel は `npm run build` の出力である `dist/` を配信する設定
+- Firebase は `users/{uid}/state/main` に設定と企業データをまとめて保存
+- ログイン後は Firebase に保存された内容がローカルに上書きされ、以後の保存も同じスナップショットに反映される
 
-初回 push 後は、GitHub リポジトリを Vercel に import し、Firebase では Hosting を有効化してこのプロジェクトを選べば、そのまま同じ成果物を使えます。
+初回 push 後は、GitHub リポジトリを Vercel に import し、Firebase では Hosting と Firestore を有効化してこのプロジェクトを選べば、そのまま同じ成果物を使えます。
 
 ## 設計メモ
 

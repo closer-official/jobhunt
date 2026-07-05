@@ -7,11 +7,25 @@ export function useSettings() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
+  const reload = () => {
     getSettings().then((s) => {
       setSettings(s);
       setLoaded(true);
     });
+  };
+
+  useEffect(() => {
+    reload();
+    const listener = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string
+    ) => {
+      if (area === "sync" && changes.settingsSync) reload();
+      if (area === "local" && changes.settingsSync) reload();
+      if (area === "local" && changes.userProfile) reload();
+    };
+    chrome.storage.onChanged.addListener(listener);
+    return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
   const save = async (next: UserSettings) => {
@@ -21,5 +35,5 @@ export function useSettings() {
     chrome.runtime.sendMessage({ type: "RESCHEDULE_ALARM" }).catch(() => {});
   };
 
-  return { settings, save, loaded };
+  return { loaded, reload, save, settings };
 }

@@ -7,10 +7,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import * as esbuild from "esbuild";
 
+const abs = (p) => path.resolve(p).replace(/\\/g, "/");
+
 await esbuild.build({
-  entryPoints: [path.resolve("tests/smoke.entry.ts")],
-  tsconfig: path.resolve("tsconfig.json"),
-  bundle: true, format: "esm", outfile: path.resolve("tests/smoke.bundle.mjs"), platform: "node",
+  entryPoints: [abs("tests/smoke.entry.ts")],
+  tsconfig: abs("tsconfig.json"),
+  bundle: true, format: "esm", outfile: abs("tests/smoke.bundle.mjs"), platform: "node",
 });
 const { parseWantedlyList, parseOnecareerList, parseOpenwork } = await import("./smoke.bundle.mjs");
 

@@ -1,18 +1,21 @@
 // sidepanel/components/SettingsPanel.tsx — 条件設定・経歴データ入力画面
 import { useEffect, useState } from "preact/hooks";
 import { UserSettings } from "../../storage/schema";
+import { CloudSyncPanel } from "./CloudSyncPanel";
+import { useCloudSync } from "../hooks/useCloudSync";
 
 interface Props {
   settings: UserSettings;
   onSave: (s: UserSettings) => Promise<void>;
   onToast: (msg: string) => void;
+  cloud: ReturnType<typeof useCloudSync>;
 }
 
 const toList = (s: string) =>
   s.split(/[、,\n]/).map((x) => x.trim()).filter(Boolean);
 const toText = (l: string[]) => l.join(", ");
 
-export function SettingsPanel({ settings, onSave, onToast }: Props) {
+export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
   const [form, setForm] = useState({
     industries: toText(settings.scoringConditions.industries),
     jobTitles: toText(settings.scoringConditions.jobTitles),
@@ -97,8 +100,35 @@ export function SettingsPanel({ settings, onSave, onToast }: Props) {
         </label>
       </section>
 
+      <CloudSyncPanel
+        enabled={cloud.enabled}
+        error={cloud.error}
+        onSignIn={async () => {
+          await cloud.signIn();
+          onToast("Firebase にサインインしました");
+        }}
+        onSignOut={async () => {
+          await cloud.signOut();
+          onToast("サインアウトしました");
+        }}
+        onSyncNow={async () => {
+          const result = await cloud.syncNow();
+          onToast(
+            result?.source === "cloud"
+              ? "Firebase から端末へ同期しました"
+              : result?.source === "local"
+                ? "端末の内容を Firebase に保存しました"
+                : "同期対象がありませんでした"
+          );
+        }}
+        status={cloud.status}
+        user={cloud.user}
+      />
+
       <button class="btn btn--primary" onClick={save}>設定を保存</button>
-      <p class="hint">条件と時刻は端末間で同期されます。経歴データはこの端末にのみ保存されます。</p>
+      <p class="hint">
+        サインインしていない場合は、この端末内にのみ保存されます。Firebase サインイン後は設定と企業データが端末間で共有されます。
+      </p>
     </div>
   );
 }

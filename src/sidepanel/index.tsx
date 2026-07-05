@@ -1,6 +1,7 @@
 // sidepanel/index.tsx — Side Panel エントリポイント
 import { render } from "preact";
 import { useState } from "preact/hooks";
+import { useCloudSync } from "./hooks/useCloudSync";
 import { useCompanyQueue } from "./hooks/useCompanyQueue";
 import { useSettings } from "./hooks/useSettings";
 import { QueueList } from "./components/QueueList";
@@ -11,6 +12,7 @@ type Tab = "queue" | "settings";
 function App() {
   const { companies, reload } = useCompanyQueue();
   const { settings, save, loaded } = useSettings();
+  const cloud = useCloudSync();
   const [tab, setTab] = useState<Tab>("queue");
   const [toast, setToast] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -62,7 +64,7 @@ function App() {
             onChanged={reload}
           />
         ) : (
-          <SettingsPanel settings={settings} onSave={save} onToast={showToast} />
+          <SettingsPanel settings={settings} onSave={save} onToast={showToast} cloud={cloud} />
         )}
       </main>
 
