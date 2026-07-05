@@ -2,11 +2,13 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import {
   browserLocalPersistence,
+  getRedirectResult,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
   setPersistence,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
   type Auth,
@@ -82,7 +84,7 @@ export async function waitForAuthReady(timeoutMs = 2000): Promise<User | null> {
   });
 }
 
-export async function signInWithGoogle(): Promise<User> {
+export async function signInWithGoogle(): Promise<User | null> {
   const instance = getFirebaseAuth();
   if (!instance) {
     throw new Error("Firebase設定が不足しています");
@@ -90,8 +92,29 @@ export async function signInWithGoogle(): Promise<User> {
   await ensureAuthPersistence();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
-  const cred = await signInWithPopup(instance, provider);
-  return cred.user;
+  try {
+    const cred = await signInWithPopup(instance, provider);
+    return cred.user;
+  } catch (err) {
+    // Chrome拡張のサイドパネルでは popup が安定しないことがあるため、redirect を試す
+    try {
+      await signInWithRedirect(instance, provider);
+      return null;
+    } catch (redirectErr) {
+      throw redirectErr instanceof Error ? redirectErr : err;
+    }
+  }
+}
+
+export async function consumeRedirectResult(): Promise<User | null> {
+  const instance = getFirebaseAuth();
+  if (!instance) return null;
+  try {
+    const result = await getRedirectResult(instance);
+    return result?.user ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function signOutFirebase(): Promise<void> {

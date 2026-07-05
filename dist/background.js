@@ -27953,6 +27953,7 @@ async function runDetailFetch(records) {
         await updateCompany(rec.companyId, (cur) => ({
           ...cur,
           status: "researching",
+          lastCaptureError: void 0,
           capturedTexts: [
             ...cur.capturedTexts,
             {
@@ -27964,7 +27965,10 @@ async function runDetailFetch(records) {
           ]
         }));
       } else {
-        await updateCompany(rec.companyId, { status: "researching" });
+        await updateCompany(rec.companyId, {
+          status: "researching",
+          lastCaptureError: result.error || "\u8A73\u7D30\u30DA\u30FC\u30B8\u306E\u81EA\u52D5\u53D6\u308A\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+        });
       }
     }
   );
@@ -27988,6 +27992,7 @@ async function handleCaptureActiveTab(companyId, label) {
   }
   const updated = await updateCompany(companyId, (cur) => ({
     ...cur,
+    lastCaptureError: void 0,
     capturedTexts: [
       // 同一URLの再キャプチャは上書き
       ...cur.capturedTexts.filter((c) => c.url !== result.url),

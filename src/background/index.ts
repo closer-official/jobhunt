@@ -133,6 +133,7 @@ async function runDetailFetch(records: CompanyRecord[]): Promise<void> {
         await updateCompany(rec.companyId, (cur) => ({
           ...cur,
           status: "researching",
+          lastCaptureError: undefined,
           capturedTexts: [
             ...cur.capturedTexts,
             {
@@ -144,7 +145,10 @@ async function runDetailFetch(records: CompanyRecord[]): Promise<void> {
           ],
         }));
       } else {
-        await updateCompany(rec.companyId, { status: "researching" });
+        await updateCompany(rec.companyId, {
+          status: "researching",
+          lastCaptureError: result.error || "詳細ページの自動取り込みに失敗しました",
+        });
         // 失敗はレコードに残す（UI側でキャプチャ0件として見える）
       }
     }
@@ -173,6 +177,7 @@ async function handleCaptureActiveTab(companyId: string, label?: string): Promis
 
   const updated = await updateCompany(companyId, (cur) => ({
     ...cur,
+    lastCaptureError: undefined,
     capturedTexts: [
       // 同一URLの再キャプチャは上書き
       ...cur.capturedTexts.filter((c) => c.url !== result.url),

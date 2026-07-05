@@ -67,7 +67,11 @@ export function CompanyCard({ record, profile, onToast, onChanged }: Props) {
         <div class="card__meta">
           {record.jobTitle && <span>{record.jobTitle}</span>}
           <span class="card__score">score {record.matchScore}</span>
+          <span class="card__score">取込 {record.capturedTexts.length}件</span>
         </div>
+        {record.lastCaptureError && (
+          <p class="hint hint--error card__error">{record.lastCaptureError}</p>
+        )}
         {/* OSステップの進捗レール */}
         <div class="rail" aria-label="進捗">
           {STEPS.map((s) => (
@@ -89,14 +93,15 @@ export function CompanyCard({ record, profile, onToast, onChanged }: Props) {
               <span class="cap-count">取込済ページ: {record.capturedTexts.length}</span>
               <CaptureStatusBadge record={record} />
             </div>
+            {record.capturedTexts.length === 0 && (
+              <p class="hint">
+                自動取り込みがまだ入っていないかもしれません。求人詳細ページや企業ページを開いてから
+                「いま開いているタブを取り込む」を押すと、本文を保存できます。
+              </p>
+            )}
             <button class="btn btn--sub" onClick={captureTab} disabled={capturing}>
               {capturing ? "取込中…" : "いま開いているタブを取り込む"}
             </button>
-            {record.capturedTexts.length === 0 && (
-              <p class="hint">
-                求人詳細の自動取得に失敗した場合は、求人ページや公式HP・noteを開いてから上のボタンで取り込んでください。
-              </p>
-            )}
             {record.capturedTexts.length > 0 && (
               <details class="captured-list">
                 <summary>取り込んだページ一覧</summary>

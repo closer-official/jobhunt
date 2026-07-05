@@ -41,6 +41,7 @@ export interface CompanyRecord {
   idealProfile: StepResult | null;  // OS③ 人物像
   esDraft: StepResult | null;       // OS④ ES/履歴書/面接対策
   updatedAt?: string; // ISO8601（クラウド同期用）
+  lastCaptureError?: string;
 }
 
 export interface ScoringConditions {

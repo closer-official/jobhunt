@@ -7427,6 +7427,9 @@ async function _getAndClearPendingRedirectStatus(resolver, auth2) {
   await persistence._remove(key);
   return hasPendingRedirect;
 }
+async function _setPendingRedirectStatus(resolver, auth2) {
+  return resolverPersistence(resolver)._set(pendingRedirectKey(auth2), "true");
+}
 function _overrideRedirectResult(auth2, result) {
   redirectOutcomeMap.set(auth2._key(), result);
 }
@@ -7435,6 +7438,29 @@ function resolverPersistence(resolver) {
 }
 function pendingRedirectKey(auth2) {
   return _persistenceKeyName(PENDING_REDIRECT_KEY, auth2.config.apiKey, auth2.name);
+}
+function signInWithRedirect(auth2, provider, resolver) {
+  return _signInWithRedirect(auth2, provider, resolver);
+}
+async function _signInWithRedirect(auth2, provider, resolver) {
+  if (_isFirebaseServerApp(auth2.app)) {
+    return Promise.reject(_serverAppCurrentUserOperationNotSupportedError(auth2));
+  }
+  const authInternal = _castAuth(auth2);
+  _assertInstanceOf(auth2, provider, FederatedAuthProvider);
+  await authInternal._initializationPromise;
+  const resolverInternal = _withDefaultResolver(authInternal, resolver);
+  await _setPendingRedirectStatus(resolverInternal, authInternal);
+  return resolverInternal._openRedirect(
+    authInternal,
+    provider,
+    "signInViaRedirect"
+    /* AuthEventType.SIGN_IN_VIA_REDIRECT */
+  );
+}
+async function getRedirectResult(auth2, resolver) {
+  await _castAuth(auth2)._initializationPromise;
+  return _getRedirectResult(auth2, resolver, false);
 }
 async function _getRedirectResult(auth2, resolverExtern, bypassAuthState = false) {
   if (_isFirebaseServerApp(auth2.app)) {
@@ -30063,8 +30089,27 @@ async function signInWithGoogle() {
   await ensureAuthPersistence();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
-  const cred = await signInWithPopup(instance, provider);
-  return cred.user;
+  try {
+    const cred = await signInWithPopup(instance, provider);
+    return cred.user;
+  } catch (err) {
+    try {
+      await signInWithRedirect(instance, provider);
+      return null;
+    } catch (redirectErr) {
+      throw redirectErr instanceof Error ? redirectErr : err;
+    }
+  }
+}
+async function consumeRedirectResult() {
+  const instance = getFirebaseAuth();
+  if (!instance) return null;
+  try {
+    const result = await getRedirectResult(instance);
+    return result?.user ?? null;
+  } catch {
+    return null;
+  }
 }
 async function signOutFirebase() {
   const instance = getFirebaseAuth();
@@ -30279,6 +30324,7 @@ function useCloudSync() {
     const bootstrap = async () => {
       try {
         await ensureAuthPersistence();
+        await consumeRedirectResult();
         unsubscribe = watchAuthState((fbUser) => {
           if (!alive) return;
           if (!fbUser) {
@@ -30884,8 +30930,14 @@ function CompanyCard({ record, profile, onToast, onChanged }) {
         /* @__PURE__ */ u3("span", { class: "card__score", children: [
           "score ",
           record.matchScore
+        ] }),
+        /* @__PURE__ */ u3("span", { class: "card__score", children: [
+          "\u53D6\u8FBC ",
+          record.capturedTexts.length,
+          "\u4EF6"
         ] })
       ] }),
+      record.lastCaptureError && /* @__PURE__ */ u3("p", { class: "hint hint--error card__error", children: record.lastCaptureError }),
       /* @__PURE__ */ u3("div", { class: "rail", "aria-label": "\u9032\u6357", children: STEPS.map((s3) => /* @__PURE__ */ u3(
         "span",
         {
@@ -30905,8 +30957,8 @@ function CompanyCard({ record, profile, onToast, onChanged }) {
           ] }),
           /* @__PURE__ */ u3(CaptureStatusBadge, { record })
         ] }),
+        record.capturedTexts.length === 0 && /* @__PURE__ */ u3("p", { class: "hint", children: "\u81EA\u52D5\u53D6\u308A\u8FBC\u307F\u304C\u307E\u3060\u5165\u3063\u3066\u3044\u306A\u3044\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002\u6C42\u4EBA\u8A73\u7D30\u30DA\u30FC\u30B8\u3084\u4F01\u696D\u30DA\u30FC\u30B8\u3092\u958B\u3044\u3066\u304B\u3089 \u300C\u3044\u307E\u958B\u3044\u3066\u3044\u308B\u30BF\u30D6\u3092\u53D6\u308A\u8FBC\u3080\u300D\u3092\u62BC\u3059\u3068\u3001\u672C\u6587\u3092\u4FDD\u5B58\u3067\u304D\u307E\u3059\u3002" }),
         /* @__PURE__ */ u3("button", { class: "btn btn--sub", onClick: captureTab, disabled: capturing, children: capturing ? "\u53D6\u8FBC\u4E2D\u2026" : "\u3044\u307E\u958B\u3044\u3066\u3044\u308B\u30BF\u30D6\u3092\u53D6\u308A\u8FBC\u3080" }),
-        record.capturedTexts.length === 0 && /* @__PURE__ */ u3("p", { class: "hint", children: "\u6C42\u4EBA\u8A73\u7D30\u306E\u81EA\u52D5\u53D6\u5F97\u306B\u5931\u6557\u3057\u305F\u5834\u5408\u306F\u3001\u6C42\u4EBA\u30DA\u30FC\u30B8\u3084\u516C\u5F0FHP\u30FBnote\u3092\u958B\u3044\u3066\u304B\u3089\u4E0A\u306E\u30DC\u30BF\u30F3\u3067\u53D6\u308A\u8FBC\u3093\u3067\u304F\u3060\u3055\u3044\u3002" }),
         record.capturedTexts.length > 0 && /* @__PURE__ */ u3("details", { class: "captured-list", children: [
           /* @__PURE__ */ u3("summary", { children: "\u53D6\u308A\u8FBC\u3093\u3060\u30DA\u30FC\u30B8\u4E00\u89A7" }),
           /* @__PURE__ */ u3("ul", { children: record.capturedTexts.map((c3) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3("a", { href: c3.url, target: "_blank", rel: "noreferrer", children: c3.label || c3.url }) }, c3.url)) })

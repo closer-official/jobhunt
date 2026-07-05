@@ -2,6 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import {
   ensureAuthPersistence,
+  consumeRedirectResult,
   signInWithGoogle,
   signOutFirebase,
   watchAuthState,
@@ -30,6 +31,7 @@ export function useCloudSync() {
     const bootstrap = async () => {
       try {
         await ensureAuthPersistence();
+        await consumeRedirectResult();
         unsubscribe = watchAuthState((fbUser) => {
           if (!alive) return;
           if (!fbUser) {
