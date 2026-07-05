@@ -23,8 +23,12 @@ export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
     priorityKeywords: toText(settings.scoringConditions.priorityKeywords),
     excludeKeywords: toText(settings.scoringConditions.excludeKeywords),
     dailyRunTime: settings.dailyRunTime,
-    resumeBase: settings.userProfile.resumeBase,
-    strengthsSummary: settings.userProfile.strengthsSummary,
+    basicProfile: settings.userProfile.basicProfile ?? "",
+    schoolCareer: settings.userProfile.schoolCareer ?? "",
+    targetDirection: settings.userProfile.targetDirection ?? "",
+    workPreferences: settings.userProfile.workPreferences ?? "",
+    resumeBase: settings.userProfile.resumeBase ?? "",
+    strengthsSummary: settings.userProfile.strengthsSummary ?? "",
   });
 
   useEffect(() => {
@@ -35,8 +39,12 @@ export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
       priorityKeywords: toText(settings.scoringConditions.priorityKeywords),
       excludeKeywords: toText(settings.scoringConditions.excludeKeywords),
       dailyRunTime: settings.dailyRunTime,
-      resumeBase: settings.userProfile.resumeBase,
-      strengthsSummary: settings.userProfile.strengthsSummary,
+      basicProfile: settings.userProfile.basicProfile ?? "",
+      schoolCareer: settings.userProfile.schoolCareer ?? "",
+      targetDirection: settings.userProfile.targetDirection ?? "",
+      workPreferences: settings.userProfile.workPreferences ?? "",
+      resumeBase: settings.userProfile.resumeBase ?? "",
+      strengthsSummary: settings.userProfile.strengthsSummary ?? "",
     });
   }, [settings]);
 
@@ -56,6 +64,10 @@ export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
       userProfile: {
         resumeBase: form.resumeBase,
         strengthsSummary: form.strengthsSummary,
+        basicProfile: form.basicProfile,
+        schoolCareer: form.schoolCareer,
+        targetDirection: form.targetDirection,
+        workPreferences: form.workPreferences,
       },
     });
     onToast("設定を保存しました");
@@ -63,6 +75,46 @@ export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
 
   return (
     <div class="settings">
+      <section>
+        <h2>はじめに</h2>
+        <p class="hint">
+          ここは「自分の情報」を入れる場所です。ES作成に使う材料を先に埋めておくと、
+          企業ごとのプロンプトが一気に作りやすくなります。
+        </p>
+      </section>
+
+      <section>
+        <h2>あなたの基本情報</h2>
+        <label>プロフィールのひとこと
+          <textarea rows={3} value={form.basicProfile} onInput={set("basicProfile")}
+            placeholder="例: 都内の大学で学び、Web系の課題解決に興味があります" />
+        </label>
+        <label>学歴・活動・実績メモ
+          <textarea rows={6} value={form.schoolCareer} onInput={set("schoolCareer")}
+            placeholder="学部・ゼミ・サークル・長期インターン・成果などを箇条書きで" />
+        </label>
+      </section>
+
+      <section>
+        <h2>ES作成の材料</h2>
+        <label>志望の方向性
+          <textarea rows={4} value={form.targetDirection} onInput={set("targetDirection")}
+            placeholder="例: 事業成長に近い場所で、企画と実行の両方に関わりたい" />
+        </label>
+        <label>働き方・条件の希望
+          <textarea rows={4} value={form.workPreferences} onInput={set("workPreferences")}
+            placeholder="例: 東京勤務 / リモート可 / 若手から裁量がほしい など" />
+        </label>
+        <label>職務経歴書のベース情報
+          <textarea rows={8} value={form.resumeBase} onInput={set("resumeBase")}
+            placeholder="学歴・職歴・担当業務・実績（数字入り）を貼り付け" />
+        </label>
+        <label>自己PR・強みの要約
+          <textarea rows={5} value={form.strengthsSummary} onInput={set("strengthsSummary")}
+            placeholder="訴求したい強みの軸（例: 課題発見→仮説設計→システム化→現場実行）" />
+        </label>
+      </section>
+
       <section>
         <h2>スコアリング条件</h2>
         <p class="hint">カンマ・読点・改行区切りで複数指定できます。</p>
@@ -86,18 +138,6 @@ export function SettingsPanel({ settings, onSave, onToast, cloud }: Props) {
       <section>
         <h2>毎日のリマインド時刻</h2>
         <input type="time" value={form.dailyRunTime} onInput={set("dailyRunTime")} />
-      </section>
-
-      <section>
-        <h2>経歴データ（ES作成④で使用）</h2>
-        <label>職務経歴書のベース情報
-          <textarea rows={8} value={form.resumeBase} onInput={set("resumeBase")}
-            placeholder="学歴・職歴・担当業務・実績（数字入り）を貼り付け" />
-        </label>
-        <label>自己PR・強みの要約
-          <textarea rows={5} value={form.strengthsSummary} onInput={set("strengthsSummary")}
-            placeholder="訴求したい強みの軸（例: 課題発見→仮説設計→システム化→現場実行）" />
-        </label>
       </section>
 
       <CloudSyncPanel

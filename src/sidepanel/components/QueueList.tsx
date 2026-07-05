@@ -18,6 +18,7 @@ export function QueueList({ companies, profile, onToast, onChanged }: Props) {
           Wantedlyの募集一覧（または ONE CAREERの企業一覧）を開いた状態で
           <strong>「本日のリサーチ開始」</strong>を押すと、条件に合う上位10件がここに並びます。
         </p>
+        <p>先に「はじめに」タブで、自分の情報も入れておくとES作成が進めやすくなります。</p>
       </div>
     );
   }

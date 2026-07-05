@@ -76,6 +76,10 @@ export function buildPrompt(
           idealProfile: record.idealProfile.content,
           resumeBase: profile.resumeBase,
           strengthsSummary: profile.strengthsSummary || "（未入力）",
+          basicProfile: profile.basicProfile || "（未入力）",
+          schoolCareer: profile.schoolCareer || "（未入力）",
+          targetDirection: profile.targetDirection || "（未入力）",
+          workPreferences: profile.workPreferences || "（未入力）",
         }),
       };
     }

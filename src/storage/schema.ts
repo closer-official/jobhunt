@@ -54,6 +54,10 @@ export interface ScoringConditions {
 export interface UserProfile {
   resumeBase: string;
   strengthsSummary: string;
+  basicProfile: string;
+  schoolCareer: string;
+  targetDirection: string;
+  workPreferences: string;
 }
 
 export interface UserSettings {
@@ -72,7 +76,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
     excludeKeywords: [],
   },
   dailyRunTime: "09:00",
-  userProfile: { resumeBase: "", strengthsSummary: "" },
+  userProfile: {
+    resumeBase: "",
+    strengthsSummary: "",
+    basicProfile: "",
+    schoolCareer: "",
+    targetDirection: "",
+    workPreferences: "",
+  },
 };
 
 // 一覧ページから抽出する求人カード

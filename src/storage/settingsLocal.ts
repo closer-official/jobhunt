@@ -13,16 +13,23 @@ export async function readSettingsSnapshotLocal(): Promise<UserSettings> {
     chrome.storage.local.get(STORAGE_KEYS.userProfile),
   ]);
   const sync = (syncRes[STORAGE_KEYS.settingsSync] as SyncPart) ?? null;
-  const profile = (localRes[STORAGE_KEYS.userProfile] as UserProfile) ?? null;
+  const profile = (localRes[STORAGE_KEYS.userProfile] as Partial<UserProfile> | null) ?? null;
   return {
     scoringConditions: sync?.scoringConditions ?? DEFAULT_SETTINGS.scoringConditions,
     dailyRunTime: sync?.dailyRunTime ?? DEFAULT_SETTINGS.dailyRunTime,
-    userProfile: profile ?? DEFAULT_SETTINGS.userProfile,
+    userProfile: {
+      ...DEFAULT_SETTINGS.userProfile,
+      ...profile,
+    },
     updatedAt: sync?.updatedAt,
   };
 }
 
 export async function writeSettingsSnapshotLocal(settings: UserSettings): Promise<void> {
+  const userProfile: UserProfile = {
+    ...DEFAULT_SETTINGS.userProfile,
+    ...settings.userProfile,
+  };
   const syncPart: SyncPart = {
     scoringConditions: settings.scoringConditions,
     dailyRunTime: settings.dailyRunTime,
@@ -33,5 +40,5 @@ export async function writeSettingsSnapshotLocal(settings: UserSettings): Promis
   } catch {
     await chrome.storage.local.set({ [STORAGE_KEYS.settingsSync]: syncPart });
   }
-  await chrome.storage.local.set({ [STORAGE_KEYS.userProfile]: settings.userProfile });
+  await chrome.storage.local.set({ [STORAGE_KEYS.userProfile]: userProfile });
 }

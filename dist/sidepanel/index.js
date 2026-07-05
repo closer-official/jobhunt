@@ -30082,7 +30082,14 @@ var DEFAULT_SETTINGS = {
     excludeKeywords: []
   },
   dailyRunTime: "09:00",
-  userProfile: { resumeBase: "", strengthsSummary: "" }
+  userProfile: {
+    resumeBase: "",
+    strengthsSummary: "",
+    basicProfile: "",
+    schoolCareer: "",
+    targetDirection: "",
+    workPreferences: ""
+  }
 };
 var STORAGE_KEYS = {
   companies: "companies",
@@ -30129,11 +30136,18 @@ async function readSettingsSnapshotLocal() {
   return {
     scoringConditions: sync?.scoringConditions ?? DEFAULT_SETTINGS.scoringConditions,
     dailyRunTime: sync?.dailyRunTime ?? DEFAULT_SETTINGS.dailyRunTime,
-    userProfile: profile ?? DEFAULT_SETTINGS.userProfile,
+    userProfile: {
+      ...DEFAULT_SETTINGS.userProfile,
+      ...profile
+    },
     updatedAt: sync?.updatedAt
   };
 }
 async function writeSettingsSnapshotLocal(settings) {
+  const userProfile = {
+    ...DEFAULT_SETTINGS.userProfile,
+    ...settings.userProfile
+  };
   const syncPart = {
     scoringConditions: settings.scoringConditions,
     dailyRunTime: settings.dailyRunTime,
@@ -30144,7 +30158,7 @@ async function writeSettingsSnapshotLocal(settings) {
   } catch {
     await chrome.storage.local.set({ [STORAGE_KEYS.settingsSync]: syncPart });
   }
-  await chrome.storage.local.set({ [STORAGE_KEYS.userProfile]: settings.userProfile });
+  await chrome.storage.local.set({ [STORAGE_KEYS.userProfile]: userProfile });
 }
 
 // src/cloud/snapshotSync.ts
@@ -30427,6 +30441,112 @@ function useSettings() {
   return { loaded, reload: reload2, save, settings };
 }
 
+// node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
+var f3 = 0;
+function u3(e3, t3, n2, o3, i3, u4) {
+  t3 || (t3 = {});
+  var a3, c3, p3 = t3;
+  if ("ref" in p3) for (c3 in p3 = {}, t3) "ref" == c3 ? a3 = t3[c3] : p3[c3] = t3[c3];
+  var l3 = { type: e3, props: p3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f3, __i: -1, __u: 0, __source: i3, __self: u4 };
+  if ("function" == typeof e3 && (a3 = e3.defaultProps)) for (c3 in a3) void 0 === p3[c3] && (p3[c3] = a3[c3]);
+  return l.vnode && l.vnode(l3), l3;
+}
+
+// src/sidepanel/components/HomePanel.tsx
+var STATUS_LABEL = {
+  disabled: "\u672A\u8A2D\u5B9A",
+  loading: "\u63A5\u7D9A\u78BA\u8A8D\u4E2D",
+  signed_out: "\u672A\u30B5\u30A4\u30F3\u30A4\u30F3",
+  signed_in: "\u540C\u671F\u6E08\u307F",
+  syncing: "\u540C\u671F\u4E2D",
+  error: "\u30A8\u30E9\u30FC"
+};
+function doneCount(settings) {
+  return [
+    settings.userProfile.basicProfile,
+    settings.userProfile.schoolCareer,
+    settings.userProfile.targetDirection,
+    settings.userProfile.workPreferences,
+    settings.userProfile.resumeBase,
+    settings.userProfile.strengthsSummary
+  ].filter(Boolean).length;
+}
+function HomePanel({
+  companiesCount,
+  onStartResearch,
+  onGoToProfile,
+  onGoToQueue,
+  cloudEnabled,
+  cloudStatus,
+  cloudUser,
+  settings
+}) {
+  const profileFilled = doneCount(settings);
+  const readyForEs = Boolean(
+    settings.userProfile.resumeBase.trim() && settings.userProfile.strengthsSummary.trim()
+  );
+  return /* @__PURE__ */ u3("div", { class: "home", children: [
+    /* @__PURE__ */ u3("section", { class: "home__hero", children: [
+      /* @__PURE__ */ u3("p", { class: "home__eyebrow", children: "\u306F\u3058\u3081\u306B" }),
+      /* @__PURE__ */ u3("h2", { children: "\u4F55\u3092\u5165\u308C\u3066\u3001\u4F55\u3092\u4F5C\u308B\u304B\u3092\u5148\u306B\u898B\u305B\u308B\u753B\u9762\u3067\u3059" }),
+      /* @__PURE__ */ u3("p", { class: "hint", children: "\u3053\u306E\u30A2\u30D7\u30EA\u306F\u300C\u4F01\u696D\u3092\u96C6\u3081\u308B\u300D\u3060\u3051\u3067\u306A\u304F\u3001 \u300C\u81EA\u5206\u306E\u60C5\u5831\u3092\u305F\u3081\u308B\u300D\u2192\u300C\u4F01\u696D\u3054\u3068\u306EES\u3092\u4F5C\u308B\u300D\u307E\u3067\u6D41\u305B\u308B\u3088\u3046\u306B\u3057\u3066\u3044\u307E\u3059\u3002" })
+    ] }),
+    /* @__PURE__ */ u3("section", { class: "home__cards", children: [
+      /* @__PURE__ */ u3("article", { class: "home-card", children: [
+        /* @__PURE__ */ u3("div", { class: "home-card__head", children: [
+          /* @__PURE__ */ u3("h3", { children: "1. \u81EA\u5206\u306E\u60C5\u5831\u3092\u5165\u308C\u308B" }),
+          /* @__PURE__ */ u3("span", { class: "home-card__meta", children: [
+            profileFilled,
+            "/6"
+          ] })
+        ] }),
+        /* @__PURE__ */ u3("p", { class: "hint", children: "\u5B66\u6B74\u30FB\u6D3B\u52D5\u30FB\u5FD7\u671B\u306E\u65B9\u5411\u6027\u30FB\u50CD\u304D\u65B9\u306E\u5E0C\u671B\u3092\u5148\u306B\u5165\u308C\u308B\u3068\u3001ES\u4F5C\u6210\u304C\u4E00\u6C17\u306B\u697D\u306B\u306A\u308A\u307E\u3059\u3002" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn--sub", onClick: onGoToProfile, children: "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u3092\u5165\u529B\u3059\u308B" })
+      ] }),
+      /* @__PURE__ */ u3("article", { class: "home-card", children: [
+        /* @__PURE__ */ u3("div", { class: "home-card__head", children: [
+          /* @__PURE__ */ u3("h3", { children: "2. \u4F01\u696D\u3092\u96C6\u3081\u308B" }),
+          /* @__PURE__ */ u3("span", { class: "home-card__meta", children: [
+            companiesCount,
+            "\u4EF6"
+          ] })
+        ] }),
+        /* @__PURE__ */ u3("p", { class: "hint", children: "\u52DF\u96C6\u4E00\u89A7\u3084\u4F01\u696D\u4E00\u89A7\u3092\u958B\u3044\u305F\u72B6\u614B\u3067\u30EA\u30B5\u30FC\u30C1\u3092\u59CB\u3081\u308B\u3068\u3001\u5019\u88DC\u304C\u3053\u3053\u306B\u4E26\u3073\u307E\u3059\u3002" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn--primary", onClick: onStartResearch, children: "\u672C\u65E5\u306E\u30EA\u30B5\u30FC\u30C1\u958B\u59CB" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn--sub", onClick: onGoToQueue, children: "\u4F01\u696D\u30EA\u30B9\u30C8\u3092\u898B\u308B" })
+      ] }),
+      /* @__PURE__ */ u3("article", { class: "home-card", children: [
+        /* @__PURE__ */ u3("div", { class: "home-card__head", children: [
+          /* @__PURE__ */ u3("h3", { children: "3. ES\u3092\u4F5C\u308B" }),
+          /* @__PURE__ */ u3("span", { class: "home-card__meta", children: readyForEs ? "\u6E96\u5099OK" : "\u672A\u6E96\u5099" })
+        ] }),
+        /* @__PURE__ */ u3("p", { class: "hint", children: "\u2460\u4F01\u696D\u7814\u7A76 \u2461\u9078\u8003\u65E5\u7A0B \u2462\u4EBA\u7269\u50CF \u3092\u305D\u308D\u3048\u308B\u3068\u3001\u2463ES\u4F5C\u6210\u306E\u30D7\u30ED\u30F3\u30D7\u30C8\u304C\u958B\u3051\u307E\u3059\u3002" }),
+        /* @__PURE__ */ u3("p", { class: "hint", children: "\u4F01\u696D\u30AB\u30FC\u30C9\u3092\u958B\u3044\u3066\u3001\u2460\u301C\u2463\u3092\u9806\u306B\u53CD\u6620\u3057\u3066\u3044\u304F\u6D41\u308C\u3067\u3059\u3002" })
+      ] })
+    ] }),
+    /* @__PURE__ */ u3("section", { class: "home__status", children: [
+      /* @__PURE__ */ u3("h3", { children: "\u3044\u307E\u306E\u72B6\u614B" }),
+      /* @__PURE__ */ u3("div", { class: "home__status-grid", children: [
+        /* @__PURE__ */ u3("div", { class: "status-pill", children: [
+          /* @__PURE__ */ u3("span", { children: "Firebase" }),
+          /* @__PURE__ */ u3("strong", { children: cloudEnabled ? STATUS_LABEL[cloudStatus] : STATUS_LABEL.disabled })
+        ] }),
+        /* @__PURE__ */ u3("div", { class: "status-pill", children: [
+          /* @__PURE__ */ u3("span", { children: "\u30B5\u30A4\u30F3\u30A4\u30F3" }),
+          /* @__PURE__ */ u3("strong", { children: cloudUser?.email ?? "\u672A\u63A5\u7D9A" })
+        ] }),
+        /* @__PURE__ */ u3("div", { class: "status-pill", children: [
+          /* @__PURE__ */ u3("span", { children: "\u5019\u88DC\u4F01\u696D" }),
+          /* @__PURE__ */ u3("strong", { children: [
+            companiesCount,
+            "\u4EF6"
+          ] })
+        ] })
+      ] })
+    ] })
+  ] });
+}
+
 // src/prompts/templates/companyResearch.ts
 var COMPANY_RESEARCH_TEMPLATE = `\u3042\u306A\u305F\u306F\u65B0\u5352\u30FB\u4E2D\u9014\u63A1\u7528\u306E\u4F01\u696D\u7814\u7A76\u3092\u652F\u63F4\u3059\u308B\u30EA\u30B5\u30FC\u30C1\u30A2\u30CA\u30EA\u30B9\u30C8\u3067\u3059\u3002
 \u4EE5\u4E0B\u306E\u300C\u53CE\u96C6\u6E08\u307F\u60C5\u5831\u300D\u3060\u3051\u3092\u4E00\u6B21\u60C5\u5831\u3068\u3057\u3066\u6271\u3044\u3001\u305D\u3053\u306B\u66F8\u304B\u308C\u3066\u3044\u306A\u3044\u3053\u3068\u306F\u63A8\u6E2C\u3068\u660E\u8A18\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u4E8B\u5B9F\u306E\u634F\u9020\u306F\u53B3\u7981\u3067\u3059\u3002
@@ -30518,6 +30638,18 @@ var ES_RESUME_TEMPLATE = `\u3042\u306A\u305F\u306FES\u6DFB\u524A\u3068\u9762\u63
 # \u5FDC\u52DF\u8005\u306E\u5F37\u307F\u30FB\u81EA\u5DF1PR\u306E\u8EF8
 {{strengthsSummary}}
 
+# \u5FDC\u52DF\u8005\u306E\u57FA\u672C\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB
+{{basicProfile}}
+
+# \u5B66\u6B74\u30FB\u6D3B\u52D5\u30E1\u30E2
+{{schoolCareer}}
+
+# \u5FD7\u671B\u306E\u65B9\u5411\u6027
+{{targetDirection}}
+
+# \u50CD\u304D\u65B9\u30FB\u6761\u4EF6\u306E\u5E0C\u671B
+{{workPreferences}}
+
 # \u51FA\u529B\u3057\u3066\u307B\u3057\u3044\u3082\u306E\uFF08\u3053\u306E\u69CB\u6210\u306E\u307E\u307E\u51FA\u529B\uFF09
 ## 1. \u5FD7\u671B\u52D5\u6A5F\uFF08400\u5B57\u7248 / 200\u5B57\u7248\u306E2\u30D1\u30BF\u30FC\u30F3\uFF09
 ## 2. \u81EA\u5DF1PR\uFF08400\u5B57\u7248 / 200\u5B57\u7248\u306E2\u30D1\u30BF\u30FC\u30F3\uFF09
@@ -30592,22 +30724,15 @@ function buildPrompt(step, record, profile) {
           schedule: record.schedule.content,
           idealProfile: record.idealProfile.content,
           resumeBase: profile.resumeBase,
-          strengthsSummary: profile.strengthsSummary || "\uFF08\u672A\u5165\u529B\uFF09"
+          strengthsSummary: profile.strengthsSummary || "\uFF08\u672A\u5165\u529B\uFF09",
+          basicProfile: profile.basicProfile || "\uFF08\u672A\u5165\u529B\uFF09",
+          schoolCareer: profile.schoolCareer || "\uFF08\u672A\u5165\u529B\uFF09",
+          targetDirection: profile.targetDirection || "\uFF08\u672A\u5165\u529B\uFF09",
+          workPreferences: profile.workPreferences || "\uFF08\u672A\u5165\u529B\uFF09"
         })
       };
     }
   }
-}
-
-// node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
-var f3 = 0;
-function u3(e3, t3, n2, o3, i3, u4) {
-  t3 || (t3 = {});
-  var a3, c3, p3 = t3;
-  if ("ref" in p3) for (c3 in p3 = {}, t3) "ref" == c3 ? a3 = t3[c3] : p3[c3] = t3[c3];
-  var l3 = { type: e3, props: p3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f3, __i: -1, __u: 0, __source: i3, __self: u4 };
-  if ("function" == typeof e3 && (a3 = e3.defaultProps)) for (c3 in a3) void 0 === p3[c3] && (p3[c3] = a3[c3]);
-  return l.vnode && l.vnode(l3), l3;
 }
 
 // src/sidepanel/components/StepPromptPanel.tsx
@@ -30712,7 +30837,7 @@ function CaptureStatusBadge({ record }) {
 }
 
 // src/sidepanel/components/CompanyCard.tsx
-var STATUS_LABEL = {
+var STATUS_LABEL2 = {
   queued: "\u672A\u7740\u624B",
   researching: "\u30EA\u30B5\u30FC\u30C1\u4E2D",
   ready_for_es: "ES\u4F5C\u6210\u53EF\u80FD",
@@ -30752,7 +30877,7 @@ function CompanyCard({ record, profile, onToast, onChanged }) {
     /* @__PURE__ */ u3("button", { class: "card__head", onClick: () => setOpen(!open), children: [
       /* @__PURE__ */ u3("div", { class: "card__title-row", children: [
         /* @__PURE__ */ u3("span", { class: "card__name", children: record.companyName }),
-        /* @__PURE__ */ u3("span", { class: `badge badge--${record.status}`, children: STATUS_LABEL[record.status] })
+        /* @__PURE__ */ u3("span", { class: `badge badge--${record.status}`, children: STATUS_LABEL2[record.status] })
       ] }),
       /* @__PURE__ */ u3("div", { class: "card__meta", children: [
         record.jobTitle && /* @__PURE__ */ u3("span", { children: record.jobTitle }),
@@ -30825,7 +30950,8 @@ function QueueList({ companies, profile, onToast, onChanged }) {
         "Wantedly\u306E\u52DF\u96C6\u4E00\u89A7\uFF08\u307E\u305F\u306F ONE CAREER\u306E\u4F01\u696D\u4E00\u89A7\uFF09\u3092\u958B\u3044\u305F\u72B6\u614B\u3067",
         /* @__PURE__ */ u3("strong", { children: "\u300C\u672C\u65E5\u306E\u30EA\u30B5\u30FC\u30C1\u958B\u59CB\u300D" }),
         "\u3092\u62BC\u3059\u3068\u3001\u6761\u4EF6\u306B\u5408\u3046\u4E0A\u4F4D10\u4EF6\u304C\u3053\u3053\u306B\u4E26\u3073\u307E\u3059\u3002"
-      ] })
+      ] }),
+      /* @__PURE__ */ u3("p", { children: "\u5148\u306B\u300C\u306F\u3058\u3081\u306B\u300D\u30BF\u30D6\u3067\u3001\u81EA\u5206\u306E\u60C5\u5831\u3082\u5165\u308C\u3066\u304A\u304F\u3068ES\u4F5C\u6210\u304C\u9032\u3081\u3084\u3059\u304F\u306A\u308A\u307E\u3059\u3002" })
     ] });
   }
   return /* @__PURE__ */ u3("div", { class: "queue", children: companies.map((c3) => /* @__PURE__ */ u3(
@@ -30841,7 +30967,7 @@ function QueueList({ companies, profile, onToast, onChanged }) {
 }
 
 // src/sidepanel/components/CloudSyncPanel.tsx
-var STATUS_LABEL2 = {
+var STATUS_LABEL3 = {
   disabled: "\u672A\u8A2D\u5B9A",
   loading: "\u63A5\u7D9A\u78BA\u8A8D\u4E2D",
   signed_out: "\u672A\u30B5\u30A4\u30F3\u30A4\u30F3",
@@ -30858,18 +30984,20 @@ function CloudSyncPanel({
   status,
   user
 }) {
+  const authHint = error && /auth\/internal-error|popup|auth/i.test(error) ? "Google\u30ED\u30B0\u30A4\u30F3\u306F\u30D6\u30E9\u30A6\u30B6\u306E\u5236\u7D04\u3067\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059\u3002\u3044\u3063\u305F\u3093\u7AEF\u672B\u5185\u4FDD\u5B58\u306E\u307E\u307E\u4F7F\u3044\u3001Firebase\u8A2D\u5B9A\u304C\u5FC5\u8981\u306A\u3089\u5F8C\u3067\u518D\u8A66\u884C\u3057\u3066\u304F\u3060\u3055\u3044\u3002" : null;
   return /* @__PURE__ */ u3("section", { class: "cloud-sync", children: [
     /* @__PURE__ */ u3("h2", { children: "Firebase \u540C\u671F" }),
     /* @__PURE__ */ u3("p", { class: "hint", children: "\u30B5\u30A4\u30F3\u30A4\u30F3\u3059\u308B\u3068\u3001\u8A2D\u5B9A\u3068\u4F01\u696D\u30C7\u30FC\u30BF\u3092 Firebase \u306B\u4FDD\u5B58\u3057\u3066\u7AEF\u672B\u9593\u3067\u5171\u6709\u3067\u304D\u307E\u3059\u3002" }),
     /* @__PURE__ */ u3("p", { class: "hint", children: [
       "\u72B6\u614B: ",
-      /* @__PURE__ */ u3("strong", { children: enabled ? STATUS_LABEL2[status] : STATUS_LABEL2.disabled }),
+      /* @__PURE__ */ u3("strong", { children: enabled ? STATUS_LABEL3[status] : STATUS_LABEL3.disabled }),
       user?.email ? /* @__PURE__ */ u3("span", { children: [
         " / ",
         user.email
       ] }) : null
     ] }),
     error && /* @__PURE__ */ u3("p", { class: "hint hint--error", children: error }),
+    authHint && /* @__PURE__ */ u3("p", { class: "hint", children: authHint }),
     /* @__PURE__ */ u3("div", { class: "sync-actions", children: [
       /* @__PURE__ */ u3("button", { class: "btn btn--sub", onClick: onSignIn, disabled: !enabled || status === "loading" || status === "syncing", children: "Google\u3067\u30B5\u30A4\u30F3\u30A4\u30F3" }),
       /* @__PURE__ */ u3("button", { class: "btn btn--sub", onClick: onSyncNow, disabled: !enabled || status === "loading" || status === "syncing", children: "\u4ECA\u3059\u3050\u540C\u671F" }),
@@ -30889,8 +31017,12 @@ function SettingsPanel({ settings, onSave, onToast, cloud }) {
     priorityKeywords: toText(settings.scoringConditions.priorityKeywords),
     excludeKeywords: toText(settings.scoringConditions.excludeKeywords),
     dailyRunTime: settings.dailyRunTime,
-    resumeBase: settings.userProfile.resumeBase,
-    strengthsSummary: settings.userProfile.strengthsSummary
+    basicProfile: settings.userProfile.basicProfile ?? "",
+    schoolCareer: settings.userProfile.schoolCareer ?? "",
+    targetDirection: settings.userProfile.targetDirection ?? "",
+    workPreferences: settings.userProfile.workPreferences ?? "",
+    resumeBase: settings.userProfile.resumeBase ?? "",
+    strengthsSummary: settings.userProfile.strengthsSummary ?? ""
   });
   h2(() => {
     setForm({
@@ -30900,8 +31032,12 @@ function SettingsPanel({ settings, onSave, onToast, cloud }) {
       priorityKeywords: toText(settings.scoringConditions.priorityKeywords),
       excludeKeywords: toText(settings.scoringConditions.excludeKeywords),
       dailyRunTime: settings.dailyRunTime,
-      resumeBase: settings.userProfile.resumeBase,
-      strengthsSummary: settings.userProfile.strengthsSummary
+      basicProfile: settings.userProfile.basicProfile ?? "",
+      schoolCareer: settings.userProfile.schoolCareer ?? "",
+      targetDirection: settings.userProfile.targetDirection ?? "",
+      workPreferences: settings.userProfile.workPreferences ?? "",
+      resumeBase: settings.userProfile.resumeBase ?? "",
+      strengthsSummary: settings.userProfile.strengthsSummary ?? ""
     });
   }, [settings]);
   const set = (key) => (e3) => setForm({ ...form, [key]: e3.target.value });
@@ -30917,12 +31053,98 @@ function SettingsPanel({ settings, onSave, onToast, cloud }) {
       dailyRunTime: form.dailyRunTime || "09:00",
       userProfile: {
         resumeBase: form.resumeBase,
-        strengthsSummary: form.strengthsSummary
+        strengthsSummary: form.strengthsSummary,
+        basicProfile: form.basicProfile,
+        schoolCareer: form.schoolCareer,
+        targetDirection: form.targetDirection,
+        workPreferences: form.workPreferences
       }
     });
     onToast("\u8A2D\u5B9A\u3092\u4FDD\u5B58\u3057\u307E\u3057\u305F");
   };
   return /* @__PURE__ */ u3("div", { class: "settings", children: [
+    /* @__PURE__ */ u3("section", { children: [
+      /* @__PURE__ */ u3("h2", { children: "\u306F\u3058\u3081\u306B" }),
+      /* @__PURE__ */ u3("p", { class: "hint", children: "\u3053\u3053\u306F\u300C\u81EA\u5206\u306E\u60C5\u5831\u300D\u3092\u5165\u308C\u308B\u5834\u6240\u3067\u3059\u3002ES\u4F5C\u6210\u306B\u4F7F\u3046\u6750\u6599\u3092\u5148\u306B\u57CB\u3081\u3066\u304A\u304F\u3068\u3001 \u4F01\u696D\u3054\u3068\u306E\u30D7\u30ED\u30F3\u30D7\u30C8\u304C\u4E00\u6C17\u306B\u4F5C\u308A\u3084\u3059\u304F\u306A\u308A\u307E\u3059\u3002" })
+    ] }),
+    /* @__PURE__ */ u3("section", { children: [
+      /* @__PURE__ */ u3("h2", { children: "\u3042\u306A\u305F\u306E\u57FA\u672C\u60C5\u5831" }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u306E\u3072\u3068\u3053\u3068",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 3,
+            value: form.basicProfile,
+            onInput: set("basicProfile"),
+            placeholder: "\u4F8B: \u90FD\u5185\u306E\u5927\u5B66\u3067\u5B66\u3073\u3001Web\u7CFB\u306E\u8AB2\u984C\u89E3\u6C7A\u306B\u8208\u5473\u304C\u3042\u308A\u307E\u3059"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u5B66\u6B74\u30FB\u6D3B\u52D5\u30FB\u5B9F\u7E3E\u30E1\u30E2",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 6,
+            value: form.schoolCareer,
+            onInput: set("schoolCareer"),
+            placeholder: "\u5B66\u90E8\u30FB\u30BC\u30DF\u30FB\u30B5\u30FC\u30AF\u30EB\u30FB\u9577\u671F\u30A4\u30F3\u30BF\u30FC\u30F3\u30FB\u6210\u679C\u306A\u3069\u3092\u7B87\u6761\u66F8\u304D\u3067"
+          }
+        )
+      ] })
+    ] }),
+    /* @__PURE__ */ u3("section", { children: [
+      /* @__PURE__ */ u3("h2", { children: "ES\u4F5C\u6210\u306E\u6750\u6599" }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u5FD7\u671B\u306E\u65B9\u5411\u6027",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 4,
+            value: form.targetDirection,
+            onInput: set("targetDirection"),
+            placeholder: "\u4F8B: \u4E8B\u696D\u6210\u9577\u306B\u8FD1\u3044\u5834\u6240\u3067\u3001\u4F01\u753B\u3068\u5B9F\u884C\u306E\u4E21\u65B9\u306B\u95A2\u308F\u308A\u305F\u3044"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u50CD\u304D\u65B9\u30FB\u6761\u4EF6\u306E\u5E0C\u671B",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 4,
+            value: form.workPreferences,
+            onInput: set("workPreferences"),
+            placeholder: "\u4F8B: \u6771\u4EAC\u52E4\u52D9 / \u30EA\u30E2\u30FC\u30C8\u53EF / \u82E5\u624B\u304B\u3089\u88C1\u91CF\u304C\u307B\u3057\u3044 \u306A\u3069"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u8077\u52D9\u7D4C\u6B74\u66F8\u306E\u30D9\u30FC\u30B9\u60C5\u5831",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 8,
+            value: form.resumeBase,
+            onInput: set("resumeBase"),
+            placeholder: "\u5B66\u6B74\u30FB\u8077\u6B74\u30FB\u62C5\u5F53\u696D\u52D9\u30FB\u5B9F\u7E3E\uFF08\u6570\u5B57\u5165\u308A\uFF09\u3092\u8CBC\u308A\u4ED8\u3051"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ u3("label", { children: [
+        "\u81EA\u5DF1PR\u30FB\u5F37\u307F\u306E\u8981\u7D04",
+        /* @__PURE__ */ u3(
+          "textarea",
+          {
+            rows: 5,
+            value: form.strengthsSummary,
+            onInput: set("strengthsSummary"),
+            placeholder: "\u8A34\u6C42\u3057\u305F\u3044\u5F37\u307F\u306E\u8EF8\uFF08\u4F8B: \u8AB2\u984C\u767A\u898B\u2192\u4EEE\u8AAC\u8A2D\u8A08\u2192\u30B7\u30B9\u30C6\u30E0\u5316\u2192\u73FE\u5834\u5B9F\u884C\uFF09"
+          }
+        )
+      ] })
+    ] }),
     /* @__PURE__ */ u3("section", { children: [
       /* @__PURE__ */ u3("h2", { children: "\u30B9\u30B3\u30A2\u30EA\u30F3\u30B0\u6761\u4EF6" }),
       /* @__PURE__ */ u3("p", { class: "hint", children: "\u30AB\u30F3\u30DE\u30FB\u8AAD\u70B9\u30FB\u6539\u884C\u533A\u5207\u308A\u3067\u8907\u6570\u6307\u5B9A\u3067\u304D\u307E\u3059\u3002" }),
@@ -30950,33 +31172,6 @@ function SettingsPanel({ settings, onSave, onToast, cloud }) {
     /* @__PURE__ */ u3("section", { children: [
       /* @__PURE__ */ u3("h2", { children: "\u6BCE\u65E5\u306E\u30EA\u30DE\u30A4\u30F3\u30C9\u6642\u523B" }),
       /* @__PURE__ */ u3("input", { type: "time", value: form.dailyRunTime, onInput: set("dailyRunTime") })
-    ] }),
-    /* @__PURE__ */ u3("section", { children: [
-      /* @__PURE__ */ u3("h2", { children: "\u7D4C\u6B74\u30C7\u30FC\u30BF\uFF08ES\u4F5C\u6210\u2463\u3067\u4F7F\u7528\uFF09" }),
-      /* @__PURE__ */ u3("label", { children: [
-        "\u8077\u52D9\u7D4C\u6B74\u66F8\u306E\u30D9\u30FC\u30B9\u60C5\u5831",
-        /* @__PURE__ */ u3(
-          "textarea",
-          {
-            rows: 8,
-            value: form.resumeBase,
-            onInput: set("resumeBase"),
-            placeholder: "\u5B66\u6B74\u30FB\u8077\u6B74\u30FB\u62C5\u5F53\u696D\u52D9\u30FB\u5B9F\u7E3E\uFF08\u6570\u5B57\u5165\u308A\uFF09\u3092\u8CBC\u308A\u4ED8\u3051"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ u3("label", { children: [
-        "\u81EA\u5DF1PR\u30FB\u5F37\u307F\u306E\u8981\u7D04",
-        /* @__PURE__ */ u3(
-          "textarea",
-          {
-            rows: 5,
-            value: form.strengthsSummary,
-            onInput: set("strengthsSummary"),
-            placeholder: "\u8A34\u6C42\u3057\u305F\u3044\u5F37\u307F\u306E\u8EF8\uFF08\u4F8B: \u8AB2\u984C\u767A\u898B\u2192\u4EEE\u8AAC\u8A2D\u8A08\u2192\u30B7\u30B9\u30C6\u30E0\u5316\u2192\u73FE\u5834\u5B9F\u884C\uFF09"
-          }
-        )
-      ] })
     ] }),
     /* @__PURE__ */ u3(
       CloudSyncPanel,
@@ -31011,7 +31206,7 @@ function App() {
   const { companies, reload: reload2 } = useCompanyQueue();
   const { settings, save, loaded } = useSettings();
   const cloud = useCloudSync();
-  const [tab, setTab] = d2("queue");
+  const [tab, setTab] = d2("home");
   const [toast, setToast] = d2(null);
   const [running, setRunning] = d2(false);
   const showToast = (msg) => {
@@ -31037,14 +31232,27 @@ function App() {
       /* @__PURE__ */ u3("button", { class: "btn btn--primary", onClick: startResearch, disabled: running, children: running ? "\u62BD\u51FA\u4E2D\u2026" : "\u672C\u65E5\u306E\u30EA\u30B5\u30FC\u30C1\u958B\u59CB" })
     ] }),
     /* @__PURE__ */ u3("nav", { class: "tabs", children: [
+      /* @__PURE__ */ u3("button", { class: tab === "home" ? "is-active" : "", onClick: () => setTab("home"), children: "\u306F\u3058\u3081\u306B" }),
       /* @__PURE__ */ u3("button", { class: tab === "queue" ? "is-active" : "", onClick: () => setTab("queue"), children: [
         "\u30AD\u30E5\u30FC\uFF08",
         companies.length,
         "\uFF09"
       ] }),
-      /* @__PURE__ */ u3("button", { class: tab === "settings" ? "is-active" : "", onClick: () => setTab("settings"), children: "\u8A2D\u5B9A" })
+      /* @__PURE__ */ u3("button", { class: tab === "settings" ? "is-active" : "", onClick: () => setTab("settings"), children: "\u81EA\u5206\u306E\u60C5\u5831" })
     ] }),
-    /* @__PURE__ */ u3("main", { class: "app__main", children: tab === "queue" ? /* @__PURE__ */ u3(
+    /* @__PURE__ */ u3("main", { class: "app__main", children: tab === "home" ? /* @__PURE__ */ u3(
+      HomePanel,
+      {
+        companiesCount: companies.length,
+        onStartResearch: startResearch,
+        onGoToProfile: () => setTab("settings"),
+        onGoToQueue: () => setTab("queue"),
+        cloudEnabled: cloud.enabled,
+        cloudStatus: cloud.status,
+        cloudUser: cloud.user,
+        settings
+      }
+    ) : tab === "queue" ? /* @__PURE__ */ u3(
       QueueList,
       {
         companies,

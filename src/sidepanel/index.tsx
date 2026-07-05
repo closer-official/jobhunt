@@ -4,16 +4,17 @@ import { useState } from "preact/hooks";
 import { useCloudSync } from "./hooks/useCloudSync";
 import { useCompanyQueue } from "./hooks/useCompanyQueue";
 import { useSettings } from "./hooks/useSettings";
+import { HomePanel } from "./components/HomePanel";
 import { QueueList } from "./components/QueueList";
 import { SettingsPanel } from "./components/SettingsPanel";
 
-type Tab = "queue" | "settings";
+type Tab = "home" | "queue" | "settings";
 
 function App() {
   const { companies, reload } = useCompanyQueue();
   const { settings, save, loaded } = useSettings();
   const cloud = useCloudSync();
-  const [tab, setTab] = useState<Tab>("queue");
+  const [tab, setTab] = useState<Tab>("home");
   const [toast, setToast] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
 
@@ -47,16 +48,30 @@ function App() {
       </header>
 
       <nav class="tabs">
+        <button class={tab === "home" ? "is-active" : ""} onClick={() => setTab("home")}>
+          はじめに
+        </button>
         <button class={tab === "queue" ? "is-active" : ""} onClick={() => setTab("queue")}>
           キュー（{companies.length}）
         </button>
         <button class={tab === "settings" ? "is-active" : ""} onClick={() => setTab("settings")}>
-          設定
+          自分の情報
         </button>
       </nav>
 
       <main class="app__main">
-        {tab === "queue" ? (
+        {tab === "home" ? (
+          <HomePanel
+            companiesCount={companies.length}
+            onStartResearch={startResearch}
+            onGoToProfile={() => setTab("settings")}
+            onGoToQueue={() => setTab("queue")}
+            cloudEnabled={cloud.enabled}
+            cloudStatus={cloud.status}
+            cloudUser={cloud.user}
+            settings={settings}
+          />
+        ) : tab === "queue" ? (
           <QueueList
             companies={companies}
             profile={settings.userProfile}

@@ -29,6 +29,11 @@ export function CloudSyncPanel({
   status,
   user,
 }: Props) {
+  const authHint =
+    error && /auth\/internal-error|popup|auth/i.test(error)
+      ? "Googleログインはブラウザの制約で失敗することがあります。いったん端末内保存のまま使い、Firebase設定が必要なら後で再試行してください。"
+      : null;
+
   return (
     <section class="cloud-sync">
       <h2>Firebase 同期</h2>
@@ -40,6 +45,7 @@ export function CloudSyncPanel({
         {user?.email ? <span> / {user.email}</span> : null}
       </p>
       {error && <p class="hint hint--error">{error}</p>}
+      {authHint && <p class="hint">{authHint}</p>}
 
       <div class="sync-actions">
         <button class="btn btn--sub" onClick={onSignIn} disabled={!enabled || status === "loading" || status === "syncing"}>

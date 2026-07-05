@@ -27455,7 +27455,14 @@ var DEFAULT_SETTINGS = {
     excludeKeywords: []
   },
   dailyRunTime: "09:00",
-  userProfile: { resumeBase: "", strengthsSummary: "" }
+  userProfile: {
+    resumeBase: "",
+    strengthsSummary: "",
+    basicProfile: "",
+    schoolCareer: "",
+    targetDirection: "",
+    workPreferences: ""
+  }
 };
 var STORAGE_KEYS = {
   companies: "companies",
@@ -27486,7 +27493,10 @@ async function readSettingsSnapshotLocal() {
   return {
     scoringConditions: sync?.scoringConditions ?? DEFAULT_SETTINGS.scoringConditions,
     dailyRunTime: sync?.dailyRunTime ?? DEFAULT_SETTINGS.dailyRunTime,
-    userProfile: profile ?? DEFAULT_SETTINGS.userProfile,
+    userProfile: {
+      ...DEFAULT_SETTINGS.userProfile,
+      ...profile
+    },
     updatedAt: sync?.updatedAt
   };
 }

@@ -42,6 +42,53 @@ body {
 }
 .tabs button.is-active { color: var(--ink); border-bottom-color: var(--primary); font-weight: 700; }
 
+/* ホーム */
+.home { display: flex; flex-direction: column; gap: 12px; }
+.home__hero {
+  background: linear-gradient(180deg, #fff, #f8fbfa);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.home__hero h2 { margin: 0 0 6px; font-size: 18px; line-height: 1.35; }
+.home__eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+}
+.home__cards { display: grid; gap: 10px; }
+.home-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.home-card__head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.home-card__head h3 { margin: 0; font-size: 14px; }
+.home-card__meta { font-size: 11px; color: var(--ink-sub); }
+.home-card .btn { margin-top: 8px; width: 100%; }
+.home__status {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.home__status h3 { margin: 0 0 8px; font-size: 13px; }
+.home__status-grid { display: grid; gap: 8px; }
+.status-pill {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fafcfd;
+}
+.status-pill span { color: var(--ink-sub); font-size: 11px; }
+.status-pill strong { font-size: 12px; }
+
 /* ボタン */
 .btn {
   display: inline-block; padding: 8px 12px; border-radius: var(--radius);
@@ -122,6 +169,7 @@ body {
 .settings { display: flex; flex-direction: column; gap: 18px; }
 .settings section { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
 .settings h2 { margin: 0 0 6px; font-size: 13px; letter-spacing: 0.06em; }
+.settings textarea { min-height: 72px; }
 .settings label { display: block; font-size: 12px; color: var(--ink-sub); margin-top: 10px; }
 .settings input, .settings textarea {
   display: block; width: 100%; margin-top: 4px; padding: 8px;
