@@ -1,0 +1,144 @@
+/* 就活OS Side Panel — 狭幅(320〜400px)前提の作業コンソール */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #1b2733;
+  --ink-sub: #5b6b7a;
+  --line: #dde3e9;
+  --primary: #0e7a6e;      /* 深いティール: 実行系 */
+  --primary-ink: #ffffff;
+  --amber: #c07a1a;        /* リサーチ中 */
+  --danger: #b3372f;
+  --done: #35506b;
+  --radius: 10px;
+  font-size: 14px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", system-ui, sans-serif;
+  line-height: 1.6;
+}
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+.app__header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 12px 14px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 5;
+}
+.app__header h1 {
+  margin: 0; font-size: 15px; letter-spacing: 0.14em; font-weight: 700;
+}
+.app__main { padding: 12px 12px 60px; }
+.loading { padding: 24px; color: var(--ink-sub); }
+
+/* タブ */
+.tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--line); }
+.tabs button {
+  flex: 1; padding: 9px 0; border: 0; background: none; cursor: pointer;
+  color: var(--ink-sub); font-size: 13px; border-bottom: 2px solid transparent;
+}
+.tabs button.is-active { color: var(--ink); border-bottom-color: var(--primary); font-weight: 700; }
+
+/* ボタン */
+.btn {
+  display: inline-block; padding: 8px 12px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  cursor: pointer; font-size: 13px;
+}
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn--primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); font-weight: 700; }
+.btn--sub { width: 100%; }
+.btn--danger { color: var(--danger); border-color: #e5c5c2; margin-top: 12px; }
+
+/* 企業カード */
+.queue { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+}
+.card__head {
+  display: block; width: 100%; text-align: left; border: 0;
+  background: none; padding: 12px 12px 10px; cursor: pointer;
+}
+.card__head:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.card__title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.card__name { font-weight: 700; font-size: 14px; }
+.card__meta { color: var(--ink-sub); font-size: 12px; display: flex; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+.card__score { font-variant-numeric: tabular-nums; }
+
+/* ステータスバッジ */
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.badge--queued { background: #e9edf1; color: var(--ink-sub); }
+.badge--researching { background: #f6ead6; color: var(--amber); }
+.badge--ready_for_es { background: #dcefec; color: var(--primary); }
+.badge--done { background: #e2e8f0; color: var(--done); }
+
+/* OS進捗レール（このツールの中心。①→④の順序そのものが情報） */
+.rail { display: flex; gap: 4px; margin-top: 8px; }
+.rail__step {
+  flex: 1; text-align: center; font-size: 10.5px; padding: 3px 0;
+  border-radius: 4px; background: #eef1f4; color: var(--ink-sub);
+  border-left: 3px solid var(--line);
+}
+.rail__step.is-done { background: #dcefec; color: var(--primary); border-left-color: var(--primary); font-weight: 700; }
+
+.card__body { border-top: 1px dashed var(--line); padding: 12px; }
+.card__capture-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cap-count { font-size: 12px; color: var(--ink-sub); }
+.cap-badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #e9edf1; color: var(--ink-sub); }
+.cap-badge.is-captured { background: #dcefec; color: var(--primary); }
+.captured-list { margin-top: 8px; font-size: 12px; }
+.captured-list a { color: var(--primary); word-break: break-all; }
+
+/* ステップタブ */
+.card__steps { display: flex; gap: 6px; margin: 14px 0 0; }
+.step-tab {
+  flex: 1; padding: 7px 0; font-size: 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer; color: var(--ink);
+}
+.step-tab.is-done { border-color: var(--primary); color: var(--primary); }
+.step-tab.is-active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.step-tab:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ステップパネル */
+.step-panel { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.step-panel__head { display: flex; justify-content: space-between; align-items: baseline; }
+.step-panel__done { font-size: 11px; color: var(--primary); }
+.step-panel__paste {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px; font-size: 13px; font-family: inherit; resize: vertical;
+}
+.step-panel__preview { font-size: 12px; }
+.step-panel__preview pre {
+  white-space: pre-wrap; background: #f6f8f9; border-radius: 8px;
+  padding: 10px; max-height: 240px; overflow: auto;
+}
+
+/* 設定 */
+.settings { display: flex; flex-direction: column; gap: 18px; }
+.settings section { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.settings h2 { margin: 0 0 6px; font-size: 13px; letter-spacing: 0.06em; }
+.settings label { display: block; font-size: 12px; color: var(--ink-sub); margin-top: 10px; }
+.settings input, .settings textarea {
+  display: block; width: 100%; margin-top: 4px; padding: 8px;
+  border: 1px solid var(--line); border-radius: 8px; font-size: 13px;
+  font-family: inherit; color: var(--ink);
+}
+.hint { font-size: 11.5px; color: var(--ink-sub); margin: 6px 0 0; }
+
+/* 空状態・トースト */
+.empty { padding: 28px 14px; color: var(--ink-sub); text-align: center; }
+.toast {
+  position: fixed; left: 12px; right: 12px; bottom: 14px;
+  background: var(--ink); color: #fff; padding: 10px 14px;
+  border-radius: var(--radius); font-size: 13px; z-index: 10;
+  animation: toast-in 0.18s ease-out;
+}
+@keyframes toast-in { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}
