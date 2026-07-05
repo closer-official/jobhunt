@@ -8,6 +8,15 @@ import path from "node:path";
 const watch = process.argv.includes("--watch");
 const rootDir = path.resolve(".").replace(/\\/g, "/");
 const abs = (p) => path.resolve(p).replace(/\\/g, "/");
+const firebaseDefaults = {
+  apiKey: "AIzaSyDN9IUtgYOZEk6fiQDALiWMA9SWhvHVXZg",
+  authDomain: "jobhunt-b0f49.firebaseapp.com",
+  projectId: "jobhunt-b0f49",
+  storageBucket: "jobhunt-b0f49.firebasestorage.app",
+  messagingSenderId: "517342175968",
+  appId: "1:517342175968:web:2e97e54ad9a5e7824c2685",
+  measurementId: "G-LJMM163TMF",
+};
 
 const common = {
   bundle: true,
@@ -22,13 +31,13 @@ const common = {
   sourcemap: false,
   define: {
     __JOBHUNT_FIREBASE_CONFIG__: JSON.stringify({
-      apiKey: process.env.JOBHUNT_FIREBASE_API_KEY ?? "",
-      authDomain: process.env.JOBHUNT_FIREBASE_AUTH_DOMAIN ?? "",
-      projectId: process.env.JOBHUNT_FIREBASE_PROJECT_ID ?? "",
-      storageBucket: process.env.JOBHUNT_FIREBASE_STORAGE_BUCKET ?? "",
-      messagingSenderId: process.env.JOBHUNT_FIREBASE_MESSAGING_SENDER_ID ?? "",
-      appId: process.env.JOBHUNT_FIREBASE_APP_ID ?? "",
-      measurementId: process.env.JOBHUNT_FIREBASE_MEASUREMENT_ID ?? "",
+      apiKey: process.env.JOBHUNT_FIREBASE_API_KEY ?? firebaseDefaults.apiKey,
+      authDomain: process.env.JOBHUNT_FIREBASE_AUTH_DOMAIN ?? firebaseDefaults.authDomain,
+      projectId: process.env.JOBHUNT_FIREBASE_PROJECT_ID ?? firebaseDefaults.projectId,
+      storageBucket: process.env.JOBHUNT_FIREBASE_STORAGE_BUCKET ?? firebaseDefaults.storageBucket,
+      messagingSenderId: process.env.JOBHUNT_FIREBASE_MESSAGING_SENDER_ID ?? firebaseDefaults.messagingSenderId,
+      appId: process.env.JOBHUNT_FIREBASE_APP_ID ?? firebaseDefaults.appId,
+      measurementId: process.env.JOBHUNT_FIREBASE_MEASUREMENT_ID ?? firebaseDefaults.measurementId,
     }),
   },
 };
