@@ -2,12 +2,11 @@
 // 使い方: node build.mjs        （1回ビルド）
 //        node build.mjs --watch （変更監視）
 import * as esbuild from "esbuild";
-import { cpSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
 const watch = process.argv.includes("--watch");
-const rootDir = path.resolve(".").replace(/\\/g, "/");
-const abs = (p) => path.resolve(p).replace(/\\/g, "/");
+const rootDir = path.resolve(".");
 const firebaseDefaults = {
   apiKey: "AIzaSyDN9IUtgYOZEk6fiQDALiWMA9SWhvHVXZg",
   authDomain: "jobhunt-b0f49.firebaseapp.com",
@@ -22,7 +21,8 @@ const common = {
   bundle: true,
   format: "esm",
   absWorkingDir: rootDir,
-  tsconfig: abs("tsconfig.json"),
+  tsconfig: "tsconfig.json",
+  nodePaths: [path.join(rootDir, "node_modules")],
   target: "chrome114",
   jsx: "automatic",
   jsxImportSource: "preact",
@@ -43,16 +43,19 @@ const common = {
 };
 
 const contexts = [
-  { entryPoints: [abs("src/background/index.ts")], outfile: abs("dist/background.js") },
-  { entryPoints: [abs("src/content-scripts/entryList.ts")], outfile: abs("dist/content/list.js"), format: "iife" },
-  { entryPoints: [abs("src/content-scripts/entryDetail.ts")], outfile: abs("dist/content/detail.js"), format: "iife" },
-  { entryPoints: [abs("src/content-scripts/entryPage.ts")], outfile: abs("dist/content/page.js"), format: "iife" },
-  { entryPoints: [abs("src/sidepanel/index.tsx")], outfile: abs("dist/sidepanel/index.js") },
+  { entryPoints: ["./src/background/index.ts"], outfile: "dist/background.js" },
+  { entryPoints: ["./src/content-scripts/entryList.ts"], outfile: "dist/content/list.js", format: "iife" },
+  { entryPoints: ["./src/content-scripts/entryDetail.ts"], outfile: "dist/content/detail.js", format: "iife" },
+  { entryPoints: ["./src/content-scripts/entryPage.ts"], outfile: "dist/content/page.js", format: "iife" },
+  { entryPoints: ["./src/sidepanel/index.tsx"], outfile: "dist/sidepanel/index.js" },
 ];
 
 function copyStatic() {
   mkdirSync("dist/sidepanel", { recursive: true });
   mkdirSync("dist/icons", { recursive: true });
+  if (existsSync("public/index.html")) {
+    cpSync("public/index.html", "dist/index.html");
+  }
   cpSync("public/manifest.json", "dist/manifest.json");
   cpSync("src/sidepanel/index.html", "dist/sidepanel/index.html");
   cpSync("src/sidepanel/styles.css", "dist/sidepanel/styles.css");

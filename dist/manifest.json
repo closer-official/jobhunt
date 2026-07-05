@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "就活OS — 半自動リサーチ&ES作成",
+  "description": "求人一覧のスコアリング、企業情報の収集、AIプロンプト生成をサイドパネルで一元管理する半自動就活ツール",
+  "version": "1.0.0",
+  "minimum_chrome_version": "114",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "就活OSを開く"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "tabs",
+    "scripting",
+    "sidePanel",
+    "clipboardWrite"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
