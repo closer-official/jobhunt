@@ -1,74 +1,81 @@
-# 就活OS — 半自動リサーチ&ES作成 Chrome拡張
+# 企業リサーチ
 
-求人一覧のスコアリング → 詳細情報の自動収集 → AIプロンプト生成（コピー&ペースト運用）をサイドパネルで一元管理する、API課金ゼロの半自動就活ツール。
+企業発見、企業研究、ES、面接準備をつなぐ、
+就活生向けのWebアプリです。
 
-## セットアップ
+初期提供形態は、Webアプリです。
+
+Chrome拡張は、初期公開から外しています。
+
+## ローカル起動
 
 ```bash
 npm install
-npm run build           # 1回ビルド（dist/ が生成される）
-npm run dev             # 開発時の変更監視
-npm test                # スモークテスト
+npm run build
+npm run dev
 ```
 
-Firebase 連携を有効化する場合は、`.env.example` を参考に次の環境変数を設定してください。
+`npm run build`は、`web-dist/`を生成します。
 
-- `JOBHUNT_FIREBASE_API_KEY`
-- `JOBHUNT_FIREBASE_AUTH_DOMAIN`
-- `JOBHUNT_FIREBASE_PROJECT_ID`
-- `JOBHUNT_FIREBASE_STORAGE_BUCKET`
-- `JOBHUNT_FIREBASE_MESSAGING_SENDER_ID`
-- `JOBHUNT_FIREBASE_APP_ID`
-- `JOBHUNT_FIREBASE_MEASUREMENT_ID`
+Vercelも、`web-dist/`を公開対象にします。
 
-1. Chromeで `chrome://extensions` を開く
-2. 右上「デベロッパーモード」をON
-3. 「パッケージ化されていない拡張機能を読み込む」→ **dist フォルダ** を選択
-4. ツールバーの拡張アイコンをクリックするとサイドパネルが開く
+## ローカル検証
 
-## 対応サイトと役割分担
+```bash
+npm test
+npm run verify
+```
 
-| サイト | 役割 | 使い方 |
-|---|---|---|
-| **Wantedly** | 求人発見（メイン） | 募集一覧を開いて「本日のリサーチ開始」→ スコアリング&自動収集 |
-| **ONE CAREER** | 企業発見 + 選考情報 | 企業一覧も「リサーチ開始」の起点にできる。選考体験記ページは「タブを取り込む」で構造化キャプチャ（面接質問・ES設問を自動抽出） |
-| **OpenWork** | 評判チェック | 企業ページを開いて「タブを取り込む」→ 総合評価・残業・年収・クチコミを構造化キャプチャ。OS①③のプロンプトが自動で反映 |
-| **OfferBox** | 予約枠（未実装） | `offerboxParser.ts` にTODO付きの枠を確保済み。実DOMサンプル入手後に配線するだけ |
+テストは、保存済みフィクスチャだけを使います。
 
-マイナビも一覧起点として引き続き使用可能。
+外部サイト、Firebase、Stripe、AIへ接続しません。
 
-## 使い方（1日の流れ）
+## 初期Webアプリ
 
-1. **設定タブ**で職種・優先キーワード・勤務地・除外キーワード・経歴データを入力して保存
-2. 毎日、設定時刻に通知が来る（`chrome.alarms` + `chrome.notifications`）
-3. Wantedlyの**募集一覧**（またはONE CAREERの企業一覧）を開いた状態で「**本日のリサーチ開始**」
-   - 一覧をスコアリング → 上位10件をキューに追加
-   - 各求人の詳細ページをバックグラウンドタブで1件ずつ自動取得（取得後タブは自動で閉じる）
-4. 公式HP・note・**OpenWork企業ページ・ONE CAREER選考体験記**は自分で開いて、企業カード内の「**いま開いているタブを取り込む**」で追加（OpenWork/ONE CAREERは専用パーサーで構造化される）
-5. 企業カードの ①研究 / ②日程 / ③人物像 で「プロンプトをコピー」→ AI（Claude等）に貼り付けて実行 → 出力を貼り付けて「反映」
-6. ①〜③がすべて反映されると **④ES** が解放。経歴データと合成したESプロンプトを生成
+- ホーム
+- 企業名入力とローカル調査下書き
+- 履歴書、職務経歴書、ES、面接準備の入口
+- 無料版と三つの有料候補
+- 認証と外部接続の状態表示
 
-## GitHub / Vercel / Firebase 連携
+現在の画面は、ローカル試作です。
 
-- GitHub リポジトリ: `closer-official/jobhunt`
-- Firebase Hosting の既定プロジェクト: `jobhunt-b0f49`
-- Vercel は `npm run build` の出力である `dist/` を配信する設定
-- Firebase は `users/{uid}/state/main` に設定と企業データをまとめて保存
-- ログイン後は Firebase に保存された内容がローカルに上書きされ、以後の保存も同じスナップショットに反映される
+実検索、実保存、実決済、実AIは未接続です。
 
-初回 push 後は、GitHub リポジトリを Vercel に import し、Firebase では Hosting と Firestore を有効化してこのプロジェクトを選べば、そのまま同じ成果物を使えます。
+## Chrome拡張の保留コード
 
-## 設計メモ
+既存の拡張コードは、削除していません。
 
-- 経歴データは `storage.sync` の8KB/アイテム制限を超えるため **storage.local** に保存（端末間同期されない）。条件・時刻のみsyncで同期
-- 詳細取得は同時1タブの逐次処理 + 1.5秒間隔（サイト負荷への配慮）、失敗時1回リトライ
-- 完了済みで60日超のレコードは自動削除（`pruneOldRecords`）
-- 各サイトのDOMは変わりやすいため、パーサーは複数セレクタのフォールバック + 汎用ヒューリスティックの2段構え。壊れたら `src/content-scripts/parsers/` の該当ファイルだけ直せばよい
-- **ONE CAREERの企業カードにはリンクが無い**（Vueのクリックナビゲーション）ため、ロゴ画像パス `square_logo/{id}/` から企業ページURLを構築している（実データ29/29一致で検証済み）
-- **スモークテスト**: `node tests/smoke.test.mjs` で実DOMフィクスチャに対するパーサー動作を検証できる。サイト構造が変わったら対象ページを保存して `tests/fixtures/` を差し替えて再検証
+将来の再検討用として、別ビルドに残しています。
 
-## 既知の制約
+```bash
+npm run build:extension
+npm run dev:extension
+```
 
-- 求人サイトの規約上、能動的なクロールは行わない（一覧は必ずユーザーが開いたタブ起点）
-- マイナビ等ログイン必須ページはログイン済みブラウザ表示が前提
-- MV3 Service Workerの仕様上、詳細自動取得中にChromeを閉じると処理が中断される（再度「リサーチ開始」せず、各カードの「タブを取り込む」で個別リカバリ可能）
+拡張成果物は、`dist/`へ生成されます。
+
+Vercelは、`dist/`を配信しません。
+
+## 外部基盤
+
+Firebaseは、初期保存先として設計しています。
+
+共有企業と学生データは、別領域へ保存します。
+
+実Firebaseへの接続と書込みは、未実施です。
+
+Stripeは、有料版の決済候補です。
+
+実商品、実決済、Webhookは、未設定です。
+
+## Vercel
+
+`vercel.json`は、次の設定です。
+
+- Build Command: `npm run build`
+- Output Directory: `web-dist`
+
+GitHubへ反映後、Vercelの次回ビルドから有効です。
+
+このリポジトリからの実デプロイは行っていません。

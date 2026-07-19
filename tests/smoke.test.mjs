@@ -10,7 +10,7 @@ import * as esbuild from "esbuild";
 const abs = (p) => path.resolve(p).replace(/\\/g, "/");
 
 await esbuild.build({
-  entryPoints: ["./tests/smoke.entry.ts"],
+  entryPoints: [abs("tests/smoke.entry.ts")],
   tsconfig: abs("tsconfig.json"),
   nodePaths: [abs("node_modules")],
   bundle: true, format: "esm", outfile: abs("tests/smoke.bundle.mjs"), platform: "node",

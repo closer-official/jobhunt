@@ -5,8 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "node build.mjs",
+    "build:web": "node build.mjs",
+    "build:extension": "node build.mjs --extension",
     "dev": "node build.mjs --watch",
-    "test": "node tests/smoke.test.mjs"
+    "dev:extension": "node build.mjs --extension --watch",
+    "test": "node tests/smoke.test.mjs && node tests/catalogImport.test.mjs && node tests/productPolicy.test.mjs",
+    "verify": "node tests/smoke.test.mjs && node tests/catalogImport.test.mjs && node tests/productPolicy.test.mjs && node build.mjs && npx tsc --noEmit && git diff --check",
+    "claude:review": "node scripts/run-claude-headless-review.mjs"
   },
   "keywords": [],
   "author": "",
